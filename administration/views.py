@@ -4,7 +4,48 @@ from main.models import Product, Order  # Import Product model
 from django.utils.text import slugify
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 
+
+
+def login_view(request):
+    if request.method == "POST":
+        identifier = request.POST.get("email")  # can be username or email
+        password = request.POST.get("password")
+
+        # Try to get user by username first, then by email
+        User = get_user_model()
+        user = None
+
+        # Check if identifier is an email
+        if "@" in identifier:
+            try:
+                user_obj = User.objects.get(email__iexact=identifier)
+                username = user_obj.username
+            except User.DoesNotExist:
+                username = None
+        else:
+            username = identifier
+
+        if username:
+            user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            next_url = request.GET.get("next") or "admin_dashboard"
+            return redirect(next_url)
+        else:
+            messages.error(request, "Invalid username/email or password")
+
+    return render(request, "login.html")
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect("login")
 
 
 @login_required
@@ -23,6 +64,7 @@ def admin_dashboard(request):
     })
     
     
+
 @login_required
 def product_create_update(request, pk=None):
     if pk:  # Editing
@@ -36,22 +78,28 @@ def product_create_update(request, pk=None):
         price = request.POST.get("price")
         image = request.FILES.get("image")
 
-        if product:  # update
-            product.name = name
-            product.description = description
-            product.price = price
-            if image:
-                product.image = image
-            product.save()
-        else:  # create
-            product = Product.objects.create(
-                name=name,
-                slug=slugify(name),
-                description=description,
-                price=price,
-                image=image,
-            )
-        return redirect("product_detail", slug=product.slug)
+        try:
+            if product:  # update
+                product.name = name
+                product.description = description
+                product.price = price
+                if image:
+                    product.image = image
+                product.save()
+                messages.success(request, "Product updated successfully.")
+            else:  # create
+                product = Product.objects.create(
+                    name=name,
+                    description=description,
+                    price=price,
+                    image=image,
+                )
+                messages.success(request, "Product created successfully.")
+
+            return redirect("admin_dashboard")
+
+        except IntegrityError:
+            messages.error(request, "A product with this name or slug already exists. Please choose another.")
 
     return render(request, "product_form.html", {"product": product})
 

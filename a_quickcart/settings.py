@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6-)wv4j(a2l)syty%@oxe@e!tyb8dnr3iqv&0wsnzudp2ji%@w'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -139,6 +139,12 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+
+# Add authentication URLs
+LOGIN_URL = '/owner/login/'
+LOGIN_REDIRECT_URL = '/owner/dashboard/'
+LOGOUT_REDIRECT_URL = '/owner/login/'
 
 
 # Media files (User-uploaded content)
