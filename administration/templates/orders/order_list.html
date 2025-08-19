@@ -1,0 +1,272 @@
+{% extends "sase.html" %}
+{% load humanize %}
+{% block title %}Admin Dashboard - Orders{% endblock %}
+{% block page_title %}Orders{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <!-- Header with search and filters -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <h3 class="text-2xl font-bold text-gray-800">Order Management</h3>
+        
+        <div class="flex flex-col sm:flex-row gap-3">
+            <form method="get" class="flex-1 flex">
+                <div class="relative flex-1">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Search orders..." 
+                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                </div>
+                <button type="submit" class="ml-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                    Search
+                </button>
+            </form>
+            
+            <!-- Status filter dropdown -->
+            <div class="relative">
+                <button type="button" class="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 flex items-center">
+                    <span>Filter</span>
+                    <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                </button>
+                <!-- Dropdown menu would go here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats summary -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+        <div class="flex items-center">
+            <div class="p-2 rounded-lg bg-gray-100 text-gray-600 mr-3">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-gray-500">Total</p>
+                <h3 class="text-lg font-bold text-gray-800">{{ total_orders }}</h3>
+            </div>
+        </div>
+    </div>
+
+    
+
+
+
+    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+        <div class="flex items-center">
+            <div class="p-2 rounded-lg bg-blue-100 text-blue-600 mr-3">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-gray-500">Pending</p>
+                <h3 class="text-lg font-bold text-gray-800">{{ pending_orders }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+        <div class="flex items-center">
+            <div class="p-2 rounded-lg bg-green-100 text-green-600 mr-3">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-gray-500">Paid</p>
+                <h3 class="text-lg font-bold text-gray-800">{{ paid_orders }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+        <div class="flex items-center">
+            <div class="p-2 rounded-lg bg-amber-100 text-amber-600 mr-3">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-gray-500">Shipped</p>
+                <h3 class="text-lg font-bold text-gray-800">{{ shipped_orders }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+        <div class="flex items-center">
+            <div class="p-2 rounded-lg bg-red-100 text-red-600 mr-3">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-gray-500">Cancelled</p>
+                <h3 class="text-lg font-bold text-gray-800">{{ cancelled_orders }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Orders list -->
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <!-- Table header (visible on larger screens) -->
+    <div class="hidden md:grid md:grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
+        <div class="col-span-3">Customer</div>
+        <div class="col-span-2">Date</div>
+        <div class="col-span-2">Amount</div>
+        
+        <div class="col-span-2">Status</div>
+        <div class="col-span-1 text-right">Actions</div>
+    </div>
+    
+    <!-- Orders -->
+    <div class="divide-y divide-gray-200">
+        {% for order in orders %}
+        <div class="p-4 md:p-6 hover:bg-gray-50 transition-colors">
+            <!-- Mobile header -->
+            <div class="flex justify-between items-start md:hidden mb-3">
+                <div>
+                    <h4 class="font-semibold text-gray-900">Order #{{ order.id }}</h4>
+                    <p class="text-sm text-gray-500">{{ order.created_at|date:"M d, Y" }}</p>
+                </div>
+                <div class="text-right">
+                    <span class="status-badge {{ order.status }} px-2.5 py-1 text-xs font-medium rounded-full">
+                        {{ order.get_status_display }}
+                    </span>
+                    <p class="text-sm font-semibold mt-1">₦{{ order.get_total_amount|intcomma }}</p>
+                </div>
+            </div>
+            
+            <!-- Order details - responsive grid -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                <!-- Customer info -->
+                <div class="md:col-span-3">
+                    <div class="flex items-center">
+                        <div class="hidden md:flex md:items-center md:justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-800 mr-3">
+                            <i class="fas fa-user text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">{{ order.full_name }}</h4>
+                            <p class="text-sm text-gray-500 truncate">{{ order.email }}</p>
+                            <p class="text-sm text-gray-500 md:hidden">{{ order.phone }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Date -->
+                <div class="md:col-span-2 hidden md:block">
+                    <p class="text-sm text-gray-900">{{ order.created_at|date:"M d, Y" }}</p>
+                    <p class="text-xs text-gray-500">{{ order.created_at|time }}</p>
+                </div>
+                
+                <!-- Amount -->
+                <div class="hidden md:block md:col-span-2">
+                    <p class="text-sm font-semibold text-gray-900">₦{{ order.get_total_amount|intcomma }}</p>
+                </div>
+                
+                
+                
+                <!-- Status -->
+                <div class="hidden md:block md:col-span-2">
+                    <span class="status-badge {{ order.status }} px-2.5 py-1 text-xs font-medium rounded-full">
+                        {{ order.get_status_display }}
+                    </span>
+                </div>
+                
+                <!-- Actions -->
+                <div class="md:col-span-1 flex justify-end">
+                    <a href="{% url "order_detail" order.id %}" class="p-2 text-indigo-600 hover:text-indigo-800 rounded-lg hover:bg-indigo-50" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Order items (visible on mobile) -->
+            <div class="mt-3 md:hidden">
+                <div class="text-sm text-gray-500 mb-2">Items:</div>
+                <div class="space-y-2">
+                    {% for item in order.items.all %}
+                    <div class="flex justify-between text-sm">
+                        <span>{{ item.quantity }} x {{ item.product.name }}</span>
+                        <span>₦{{ item.get_total_price|intcomma }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-3 pt-3 border-t border-gray-200 flex justify-between">
+                    <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">View Details</a>
+                    
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="py-12 text-center">
+            <div class="inline-flex items-center justify-center rounded-full bg-gray-100 w-16 h-16 mb-4">
+                <i class="fas fa-shopping-bag text-2xl text-gray-400"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No orders found</h3>
+            <p class="text-gray-500">Try adjusting your search or check back later.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if orders.has_other_pages %}
+<div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="text-sm text-gray-700">
+        Showing <span class="font-medium">{{ orders.start_index }}</span> to 
+        <span class="font-medium">{{ orders.end_index }}</span> of 
+        <span class="font-medium">{{ orders.paginator.count }}</span> results
+    </div>
+    
+    <nav class="inline-flex rounded-md shadow-sm">
+        {% if orders.has_previous %}
+        <a href="?q={{ query }}&page={{ orders.previous_page_number }}" class="px-3.5 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        {% else %}
+        <span class="px-3.5 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400">
+            <i class="fas fa-chevron-left"></i>
+        </span>
+        {% endif %}
+        
+        {% for num in orders.paginator.page_range %}
+            {% if orders.number == num %}
+            <span class="px-4 py-2 border-t border-b border-gray-300 bg-indigo-600 text-sm font-medium text-white">{{ num }}</span>
+            {% else %}
+            <a href="?q={{ query }}&page={{ num }}" class="px-4 py-2 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if orders.has_next %}
+        <a href="?q={{ query }}&page={{ orders.next_page_number }}" class="px-3.5 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+        {% else %}
+        <span class="px-3.5 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400">
+            <i class="fas fa-chevron-right"></i>
+        </span>
+        {% endif %}
+    </nav>
+</div>
+{% endif %}
+
+<style>
+    .status-badge.pending {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }
+    .status-badge.paid {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    .status-badge.shipped {
+        background-color: #DBEAFE;
+        color: #1E40AF;
+    }
+    .status-badge.completed {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    .status-badge.cancelled {
+        background-color: #FEE2E2;
+        color: #B91C1C;
+    }
+</style>
+{% endblock %}

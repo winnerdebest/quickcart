@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6-)wv4j(a2l)syty%@oxe@e!tyb8dnr3iqv&0wsnzudp2ji%@w'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Flutterwave secret key
@@ -55,8 +55,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    "django.contrib.humanize",
     'main',  # Main app for the quick cart
     'corsheaders',  # CORS headers for API requests
+    'administration',  # Administration app for managing the quick cart
 ]
 
 MIDDLEWARE = [

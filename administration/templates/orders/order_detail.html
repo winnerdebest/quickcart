@@ -1,0 +1,330 @@
+{% extends "sase.html" %}
+{% load humanize %}
+{% block title %}Admin Dashboard - Order #{{ order.id }}{% endblock %}
+{% block page_title %}Order #{{ order.id }}{% endblock %}
+
+{% block extra_head %}
+<!-- WhatsApp checking API -->
+<script>
+    function checkWhatsApp(phone) {
+        // Remove any non-digit characters except '+' if present
+        const cleanedPhone = phone.replace(/[^\d+]/g, '');
+        // Open WhatsApp with the phone number
+        window.open(`https://api.whatsapp.com/send?phone=₦{cleanedPhone}`, '_blank');
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header with status and actions -->
+    <div class="bg-white rounded-xl shadow-sm p-5 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="status-badge {{ order.status }} px-3 py-1 text-sm font-medium rounded-full">
+                        {{ order.get_status_display }}
+                    </span>
+                    <span class="text-sm text-gray-500">Placed on {{ order.created_at|date:"M d, Y" }}</span>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900">Order #{{ order.id }}</h2>
+            </div>
+            
+            <div class="flex flex-wrap gap-2">
+                {% if order.status == "paid" %}
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm">
+                        Mark as Shipped
+                    </button>
+                </form>
+                {% endif %}
+                <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                    Print Invoice
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left column - Order details -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Customer information -->
+            <div class="bg-white rounded-xl shadow-sm p-5">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Customer Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">Contact</h4>
+                        <p class="text-gray-900">{{ order.full_name }}</p>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                            <a href="mailto:{{ order.email }}" class="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-envelope mr-1.5 text-gray-500"></i>
+                                {{ order.email }}
+                            </a>
+                            <div class="relative group">
+                                <a href="tel:{{ order.phone }}" class="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-phone mr-1.5 text-gray-500"></i>
+                                    {{ order.phone }}
+                                </a>
+                                <button onclick="checkWhatsApp('{{ order.phone }}')" class="ml-1 inline-flex items-center px-2 py-1.5 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200 transition-colors">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
+                                <div class="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                    Click phone to call, WhatsApp icon to message
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">Shipping Address</h4>
+                        <p class="text-gray-900 whitespace-pre-line">{{ order.address }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment information -->
+            <div class="bg-white rounded-xl shadow-sm p-5">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Payment Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">Status</h4>
+                        <span class="px-3 py-1 text-sm font-medium rounded-full 
+                            {% if order.transaction_ref %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                            {% if order.transaction_ref %}Paid{% else %}Pending{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">Transaction Reference</h4>
+                        <p class="text-gray-900">
+                            {% if order.transaction_ref %}
+                                {{ order.transaction_ref }}
+                            {% else %}
+                                Not available
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">Payment Method</h4>
+                        <p class="text-gray-900">
+                            {% if order.payment_method %}
+                                {{ order.payment_method }}
+                            {% else %}
+                                Not specified
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">Flutterwave Transaction ID</h4>
+                        <p class="text-gray-900">
+                            {% if order.flutterwave_transaction_id %}
+                                {{ order.flutterwave_transaction_id }}
+                            {% else %}
+                                Not available
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order items -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Order Items</h3>
+                </div>
+                <div class="divide-y divide-gray-200">
+                    {% for item in order.items.all %}
+                    <div class="p-5">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-16 w-16 bg-gray-200 rounded-lg overflow-hidden">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="h-full w-full object-cover">
+                                {% else %}
+                                <div class="h-full w-full flex items-center justify-center bg-gray-100">
+                                    <i class="fas fa-box-open text-gray-400"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="ml-4 flex-1">
+                                <h4 class="text-sm font-medium text-gray-900">{{ item.product.name }}</h4>
+                                <p class="mt-1 text-sm text-gray-500">Quantity: {{ item.quantity }}</p>
+                                <p class="mt-1 text-sm text-gray-500">Unit Price: ₦{{ item.price|intcomma }}</p>
+                            </div>
+                            
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-900">₦{{ item.get_total_price|intcomma }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="px-5 py-4 bg-gray-50">
+                    <div class="flex justify-between text-base font-medium text-gray-900">
+                        <p>Total</p>
+                        <p>₦{{ order.get_total_amount|intcomma }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right column - Timeline and actions -->
+        <div class="space-y-6">
+            <!-- Order timeline -->
+            <div class="bg-white rounded-xl shadow-sm p-5">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Order Timeline</h3>
+                <div class="flow-root">
+                    <ul class="-mb-8">
+                        <li class="relative pb-8">
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 flex justify-between space-x-4">
+                                    <div>
+                                        <p class="text-sm text-gray-900">Order placed</p>
+                                        <p class="text-sm text-gray-500">{{ order.created_at|timesince }} ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        
+                        {% if order.status != "pending" %}
+                        <li class="relative pb-8">
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 flex justify-between space-x-4">
+                                    <div>
+                                        <p class="text-sm text-gray-900">Payment confirmed</p>
+                                        <p class="text-sm text-gray-500">
+                                            {% if order.updated_at != order.created_at %}
+                                                {{ order.updated_at|timesince }} ago
+                                            {% else %}
+                                                Recently
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {% endif %}
+                        
+                        {% if order.status == "shipped" or order.status == "completed" %}
+                        <li class="relative pb-8">
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 flex justify-between space-x-4">
+                                    <div>
+                                        <p class="text-sm text-gray-900">Order shipped</p>
+                                        <p class="text-sm text-gray-500">In transit</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {% endif %}
+                        
+                        {% if order.status == "completed" %}
+                        <li class="relative">
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 flex justify-between space-x-4">
+                                    <div>
+                                        <p class="text-sm text-gray-900">Order delivered</p>
+                                        <p class="text-sm text-gray-500">Successfully completed</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {% else %}
+                        <li class="relative">
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center ring-8 ring-white">
+                                        <i class="fas fa-ellipsis-h text-white text-xs"></i>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 flex justify-between space-x-4">
+                                    <div>
+                                        <p class="text-sm text-gray-900">Order delivery</p>
+                                        <p class="text-sm text-gray-500">Pending</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Quick actions -->
+            <div class="bg-white rounded-xl shadow-sm p-5">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+                <div class="space-y-2">
+                    <a href="mailto:{{ order.email }}?subject=Order%20%23{{ order.id }}%20Update" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i class="fas fa-envelope mr-2 text-gray-500"></i>
+                        Send Email
+                    </a>
+                    <a href="tel:{{ order.phone }}" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i class="fas fa-phone mr-2 text-gray-500"></i>
+                        Call Customer
+                    </a>
+                    <button onclick="checkWhatsApp('{{ order.phone }}')" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i class="fab fa-whatsapp mr-2 text-green-500"></i>
+                        WhatsApp Message
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Order notes -->
+            <div class="bg-white rounded-xl shadow-sm p-5">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Order Notes</h3>
+                <textarea rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Add internal notes about this order..."></textarea>
+                <button class="mt-2 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                    Save Note
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .status-badge.pending {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }
+    .status-badge.paid {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    .status-badge.shipped {
+        background-color: #DBEAFE;
+        color: #1E40AF;
+    }
+    .status-badge.completed {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    .status-badge.cancelled {
+        background-color: #FEE2E2;
+        color: #B91C1C;
+    }
+</style>
+{% endblock %}

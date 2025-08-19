@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .error-container {
+            max-width: 32rem;
+            transition: all 0.3s ease;
+        }
+        
+        .error-icon {
+            font-size: 6rem;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+        }
+        
+        .error-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translatey(0px); }
+            50% { transform: translatey(-10px); }
+            100% { transform: translatey(0px); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes shake {
+            0% { transform: translatex(0); }
+            100% { transform: translatex(5px); }
+        }
+        
+        .server-status {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .status-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .status-progress {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+            width: 30%;
+            animation: progressPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes progressPulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="error-container text-center error-card rounded-2xl p-8 md:p-10 floating">
+        <div class="error-icon mb-6">
+            <i class="fas fa-server"></i>
+        </div>
+        
+        <h1 class="text-5xl md:text-6xl font-bold text-gray-800 mb-4">500</h1>
+        <h2 class="text-2xl md:text-3xl font-semibold text-gray-700 mb-6">Server Error</h2>
+        
+        <p class="text-gray-600 mb-6 leading-relaxed">
+            Oops! Something went wrong on our servers. We're working to fix the issue.
+            Please try again later or contact support if the problem persists.
+        </p>
+        
+        <div class="server-status">
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-700">Server Status</span>
+                <span class="text-sm font-medium text-red-600">Unstable</span>
+            </div>
+            <div class="status-bar">
+                <div class="status-progress"></div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+            <a href="/" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center">
+                <i class="fas fa-home mr-2"></i> Back to Dashboard
+            </a>
+            <button onclick="location.reload()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center">
+                <i class="fas fa-redo mr-2"></i> Try Again
+            </button>
+        </div>
+        
+        
+    </div>
+
+    <script>
+        // Add a subtle animation to the container
+        document.querySelector('.error-container').addEventListener('mouseover', function() {
+            this.classList.remove('floating');
+            this.classList.add('shake');
+        });
+        
+        document.querySelector('.error-container').addEventListener('mouseout', function() {
+            this.classList.remove('shake');
+            this.classList.add('floating');
+        });
+        
+        // Simulate a retry mechanism
+        document.querySelector('button').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Trying...';
+            this.disabled = true;
+            
+            setTimeout(function() {
+                window.location.reload();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
