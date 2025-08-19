@@ -29,6 +29,22 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# Flutterwave secret key
+FLUTTERWAVE_SECRET_KEY = "FLWSECK_TEST-d0eadb024eb5ccd595cfc29f234979bf-X"
+FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK_TEST-2a7eaa629530f2da88b22f7eaf1d527c-X"
+
+
+
+# CORS settings 
+CORS_ALLOWED_ORIGINS = [
+    "https://checkout.flutterwave.com",
+    "https://api.flutterwave.com",
+]
+
+
+# Security settings
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,11 +56,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'main',  # Main app for the quick cart
+    'corsheaders',  # CORS headers for API requests
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    
+    "corsheaders.middleware.CorsMiddleware",
+    
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -100,6 +120,11 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+EMAIL_BACKEND ='django.core.mail.backends.console.EmailBackend'
+
+
 
 
 # Internationalization

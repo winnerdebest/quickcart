@@ -34,10 +34,24 @@ class Order(models.Model):
     phone = models.CharField(max_length=20)
     address = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    
+
+    transaction_ref = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    flutterwave_transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    payment_method = models.CharField(max_length=50, blank=True, null=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def get_total_amount(self):
+        """Calculate the total amount for this order"""
+        return sum(item.get_total_price() for item in self.items.all())
 
     def __str__(self):
         return f"Order {self.id} - {self.full_name}"
+
+    class Meta:
+        ordering = ['-created_at']
 
 
 class OrderItem(models.Model):
@@ -51,6 +65,7 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
+
 
 
 # Optional: Log completed sales separately (if you want extra reporting)

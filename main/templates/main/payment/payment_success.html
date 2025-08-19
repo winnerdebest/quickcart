@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Successful - QuickCart{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+        <!-- Success Icon -->
+        <div class="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-check text-3xl text-green-600 dark:text-green-400"></i>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-green-600 dark:text-green-400 mb-4">Payment Successful!</h1>
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
+            Thank you for your order. Your payment has been processed successfully.
+        </p>
+        
+        <!-- Order Details -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Order Details</h2>
+            <div class="text-left space-y-2">
+                <div class="flex justify-between">
+                    <span>Order ID:</span>
+                    <span class="font-mono">#{{ order.id }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Transaction ID:</span>
+                    <span class="font-mono text-sm">{{ transaction_id }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Customer:</span>
+                    <span>{{ order.full_name }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Email:</span>
+                    <span>{{ order.email }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Status:</span>
+                    <span class="text-green-600 dark:text-green-400 font-semibold">{{ order.get_status_display }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Items -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">Items Ordered</h3>
+            <div class="space-y-3">
+                {% for item in order.items.all %}
+                <div class="flex justify-between items-center">
+                    <div class="text-left">
+                        <div class="font-medium">{{ item.product.name }}</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ item.quantity }} × ₦{{ item.price }}
+                        </div>
+                    </div>
+                    <div class="font-semibold">₦{{ item.get_total_price }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-600 pt-3 mt-3">
+                <div class="flex justify-between font-bold text-lg">
+                    <span>Total</span>
+                    <span>₦{{ total }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Next Steps -->
+        <div class="text-sm text-gray-600 dark:text-gray-300 mb-6">
+            <p>We'll send you a confirmation email shortly with your order details and tracking information.</p>
+            <p class="mt-2">Expected delivery: 2-3 business days</p>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+            <a href="/" class="block w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-lg transition-colors">
+                Continue Shopping
+            </a>
+            <button onclick="window.print()" class="block w-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 py-3 px-6 rounded-lg transition-colors">
+                <i class="fas fa-print mr-2"></i>
+                Print Receipt
+            </button>
+            <button id="downloadReceiptBtn" 
+                    class="block w-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 
+                        text-gray-800 dark:text-gray-200 py-3 px-6 rounded-lg transition-colors">
+                <i class="fas fa-download mr-2"></i>
+                Download Receipt
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- WhatsApp Contact -->
+<div class="text-center mt-6">
+    <p class="text-sm text-gray-600 dark:text-gray-300">
+        Need help? 
+        <a href="https://wa.me/1234567890" class="text-[#25D366] hover:underline">
+            <i class="fab fa-whatsapp"></i> Chat with us on WhatsApp
+        </a>
+    </p>
+</div>
+
+
+<script>
+document.getElementById('downloadReceiptBtn').addEventListener('click', function() {
+    // Target only the receipt container
+    const element = document.querySelector('.max-w-2xl');
+
+    const opt = {
+        margin:       0.5,
+        filename:     `QuickCart_Receipt_{{ order.id }}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - QuickCart{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200 min-h-screen"
+     x-data="{ quantity: 1, price: {{ product.price }}, selectedVariant: null }">
+    
+    <div class="md:flex">
+        <!-- Product Image -->
+        <div class="md:w-1/2 p-4 ">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                     class="w-full h-auto max-h-96 object-contain rounded-lg">
+            {% else %}
+                <div class="w-full h-64 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded-lg">
+                    <i class="fas fa-image text-4xl text-gray-400"></i>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Info -->
+        <div class="md:w-1/2 p-6">
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold mb-2">{{ product.name }}</h1>
+                
+                
+                <p class="text-gray-700 dark:text-gray-300 mb-4">{{ product.description }}</p>
+                
+                <div class="mb-6">
+                    <span class="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                        ₦<span x-text="(quantity * price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"></span>
+                    </span>
+                    <span x-show="quantity > 1" class="text-sm text-gray-500 ml-2">
+                        (₦<span x-text="price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"></span> each)
+                    </span>
+                </div>
+                </div>
+            </div>
+
+            <!-- Add to Cart Button -->
+            <div class="flex gap-3">
+                <button 
+                    @click="$store.cart.add({
+                        id: '{{ product.id }}_' + Date.now(), 
+                        name: '{{ product.name }}', 
+                        price: (quantity * price).toFixed(2), 
+                        image: '{% if product.image %}{{ product.image.url }}{% else %}{% static "path/to/default-image.jpg" %}{% endif %}',
+                        quantity: quantity
+                    }); 
+                    $dispatch('notify', { 
+                        message: `Added ${quantity} ${quantity > 1 ? 'items' : 'item'} to cart`, 
+                        type: 'success'
+                    })"
+                    class="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-lg transition-colors">
+                    <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                </button>
+                
+                <button class="p-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

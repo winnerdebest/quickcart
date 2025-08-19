@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Products - QuickCart{% endblock %}
+
+{% block content %}
+<div x-data="{ 
+    products: [], loading: false, page: 1, hasMore: true, searchQuery: '',
+    async fetchProducts() {
+        if (this.loading) return;
+        this.loading = true;
+        const response = await fetch(`/?page=${this.page}&q=${this.searchQuery}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await response.json();
+        this.products = [...this.products, ...data.results];
+        this.hasMore = data.has_next;
+        this.loading = false;
+    },
+    search() {
+        this.page = 1; this.products = []; this.hasMore = true; this.fetchProducts();
+    }
+}" 
+x-init="fetchProducts(); window.onscroll = () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500 && !loading && hasMore) {
+        page++; fetchProducts();
+    }
+}">
+
+    <!-- Search Bar -->
+    <div class="mb-8 max-w-md mx-auto">
+        <div class="relative">
+            <input x-model="searchQuery" @input.debounce.500ms="search()" type="text"
+                   placeholder="Search products..."
+                   class="w-full py-3 px-5 pr-12 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-primary-500">
+            <button @click="search()" class="absolute right-3 top-3 text-gray-400 hover:text-primary-600">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <template x-for="product in products" :key="product.id">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+            <img :src="product.image" :alt="product.name" class="w-full h-48 object-cover">
+            <div class="p-5">
+                <!-- Name & Price Row -->
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="font-bold text-lg" x-text="product.name"></h3>
+                    <span class="text-primary-600 dark:text-primary-400 font-semibold"
+                        x-text="'₦' + Number(product.price).toLocaleString()"></span>
+                </div>
+
+                <!-- Description -->
+                <p class="text-gray-600 dark:text-gray-300 text-sm mb-4"
+                   x-text="product.description.substring(0, 60) + (product.description.length > 60 ? '...' : '')"></p>
+
+                <!-- Actions -->
+                <div class="flex justify-between items-center">
+                    <button @click="$store.cart.add(product)" 
+                            class="bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg text-sm flex items-center">
+                        <i class="fas fa-cart-plus mr-2"></i> Add
+                    </button>
+                    <a :href="'/products/' + product.slug"
+                       class="text-primary-600 hover:text-primary-800 text-sm font-medium flex items-center">
+                        Details <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+
+
+    <!-- Loading & End States -->
+    <div x-show="loading" class="text-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+    </div>
+    <div x-show="!hasMore && products.length > 0" class="text-center py-8 text-gray-500">
+        You've reached the end
+    </div>
+    <div x-show="products.length === 0 && !loading" class="text-center py-8 text-gray-500">
+        No products found
+    </div>
+</div>
+{% endblock %}

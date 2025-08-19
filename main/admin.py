@@ -23,6 +23,8 @@ class OrderItemInline(admin.TabularInline):
     can_delete = False
 
     def get_total_price(self, obj):
+        if obj.price is None or obj.quantity is None:
+            return 0
         return obj.get_total_price()
     get_total_price.short_description = "Total Price"
 
