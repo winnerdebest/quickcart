@@ -83,7 +83,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Custom middleware for visitor notifications
-    "main.middleware.VisitorNotificationMiddleware"
+    #"main.middleware.VisitorNotificationMiddleware"
 ]
 
 #MIDDLEWARE += ["main.middleware.VisitorNotificationMiddleware"]

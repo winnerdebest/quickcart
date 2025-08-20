@@ -1,6 +1,6 @@
 from .utils.notifications import send_notify_event
 
-"""class VisitorNotificationMiddleware:
+class VisitorNotificationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -14,4 +14,4 @@ from .utils.notifications import send_notify_event
             send_notify_event(f"👤 New visitor at {path} from {ip}", "New Visitor")
             request.session["visitor_notified"] = True  # mark session as notified
 
-        return response"""
+        return response
