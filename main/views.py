@@ -241,51 +241,46 @@ def payment_callback(request):
         status = request.GET.get('status')
         tx_ref = request.GET.get('tx_ref')
         transaction_id = request.GET.get('transaction_id')
+        payment_type = request.GET.get('payment_type')  # If available
 
-        if status == 'completed' and transaction_id:
-            # Verify the payment
-            if verify_flutterwave_payment(transaction_id):
-                # Extract order ID from tx_ref
-                try:
-                    order_id = tx_ref.split('_')[1]
-                    order = Order.objects.get(id=order_id)
+        if tx_ref:
+            try:
+                order_id = tx_ref.split('_')[1]
+                order = Order.objects.get(id=order_id)
+            except (Order.DoesNotExist, IndexError, ValueError):
+                return render(request, 'main/payment/payment_error.html', {
+                    'error': 'Invalid order reference'
+                })
+
+            # Save transaction info regardless of status
+            order.transaction_ref = tx_ref
+            order.flutterwave_transaction_id = transaction_id
+            order.payment_method = payment_type or "Flutterwave"
+            order.save()
+
+            if status == 'completed' and transaction_id:
+                # Verify the payment
+                if verify_flutterwave_payment(transaction_id):
                     order.status = 'paid'
                     order.save()
-
-                    # Compute total here
-                    total = sum(item.get_total_price() for item in order.items.all())
-
+                    total = order.get_total_amount()
                     return render(request, 'main/payment/payment_success.html', {
                         'order': order,
                         'transaction_id': transaction_id,
                         'total': total,
                     })
-                except (Order.DoesNotExist, IndexError, ValueError):
-                    return render(request, 'payment_error.html', {
-                        'error': 'Invalid order reference'
+                else:
+                    order.status = 'cancelled'
+                    order.save()
+                    return render(request, 'main/payment/payment_error.html', {
+                        'error': 'Payment verification failed. Your order has been cancelled.'
                     })
             else:
-                # Payment verification failed, delete the order
-                try:
-                    order_id = tx_ref.split('_')[1]
-                    order = Order.objects.get(id=order_id)
-                    order.delete()
-                except (Order.DoesNotExist, IndexError, ValueError):
-                    pass
+                order.status = 'cancelled'
+                order.save()
                 return render(request, 'main/payment/payment_error.html', {
-                    'error': 'Payment verification failed. Your order has been cancelled.'
+                    'error': 'Payment was not successful. Your order has been cancelled.'
                 })
-        else:
-            # Payment was not successful, delete the order
-            try:
-                order_id = tx_ref.split('_')[1]
-                order = Order.objects.get(id=order_id)
-                order.delete()
-            except (Order.DoesNotExist, IndexError, ValueError):
-                pass
-            return render(request, 'main/payment/payment_error.html', {
-                'error': 'Payment was not successful. Your order has been cancelled.'
-            })
 
     return render(request, 'main/payment/payment_error.html', {
         'error': 'Invalid request method'

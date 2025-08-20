@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ["*"]
 FLUTTERWAVE_SECRET_KEY = "FLWSECK_TEST-d0eadb024eb5ccd595cfc29f234979bf-X"
 FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK_TEST-2a7eaa629530f2da88b22f7eaf1d527c-X"
 
+NOTIFY_EVENTS_SOURCE = "0ljmypknfcerbxjbfqiclnzunv7ugfof"
 
 
 # CORS settings 
@@ -56,7 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     "django.contrib.humanize",
-    'main',  # Main app for the quick cart
+    'main.apps.MainConfig',  # Main app for the quick cart
     'corsheaders',  # CORS headers for API requests
     'administration',  # Administration app for managing the quick cart
 ]
@@ -72,7 +73,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Custom middleware for visitor notifications
+    "main.middleware.VisitorNotificationMiddleware"
 ]
+
+#MIDDLEWARE += ["main.middleware.VisitorNotificationMiddleware"]
 
 ROOT_URLCONF = 'a_quickcart.urls'
 

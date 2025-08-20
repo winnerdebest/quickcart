@@ -1,9 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Products - QuickCart{% endblock %}
+{% block title %}Products - Variety by Oge{% endblock %}
 
 {% block content %}
 <div x-data="{ 
-    products: [], loading: false, page: 1, hasMore: true, searchQuery: '',
+    products: [], loading: false, page: 1, hasMore: true, searchQuery: '', filtersOpen: false,
+    sortBy: 'featured', selectedCategory: 'all',
+    categories: ['All', 'Electronics', 'Fashion', 'Home', 'Beauty', 'Sports'],
     async fetchProducts() {
         if (this.loading) return;
         this.loading = true;
@@ -25,61 +27,89 @@ x-init="fetchProducts(); window.onscroll = () => {
     }
 }">
 
-    <!-- Search Bar -->
-    <div class="mb-8 max-w-md mx-auto">
-        <div class="relative">
-            <input x-model="searchQuery" @input.debounce.500ms="search()" type="text"
-                   placeholder="Search products..."
-                   class="w-full py-3 px-5 pr-12 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-primary-500">
-            <button @click="search()" class="absolute right-3 top-3 text-gray-400 hover:text-primary-600">
-                <i class="fas fa-search"></i>
-            </button>
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Discover Our Products</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">Find exactly what you're looking for from our curated collection</p>
+    </div>
+
+    <!-- Centered Search Bar Only -->
+    <div class="flex justify-center mb-8">
+        <div class="w-full max-w-md">
+            <div class="relative">
+                <input x-model="searchQuery" @input.debounce.500ms="search()" type="text"
+                       placeholder="Search products..."
+                       class="w-full py-3 px-5 pr-12 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <button @click="search()" class="absolute right-3 top-3 text-gray-400 hover:text-primary-600">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Product Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    <template x-for="product in products" :key="product.id">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-            <img :src="product.image" :alt="product.name" class="w-full h-48 object-cover">
-            <div class="p-5">
-                <!-- Name & Price Row -->
-                <div class="flex justify-between items-center mb-1">
-                    <h3 class="font-bold text-lg" x-text="product.name"></h3>
-                    <span class="text-primary-600 dark:text-primary-400 font-semibold"
-                        x-text="'₦' + Number(product.price).toLocaleString()"></span>
-                </div>
-
-                <!-- Description -->
-                <p class="text-gray-600 dark:text-gray-300 text-sm mb-4"
-                   x-text="product.description.substring(0, 60) + (product.description.length > 60 ? '...' : '')"></p>
-
-                <!-- Actions -->
-                <div class="flex justify-between items-center">
-                    <button @click="$store.cart.add(product)" 
-                            class="bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg text-sm flex items-center">
-                        <i class="fas fa-cart-plus mr-2"></i> Add
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <template x-for="product in products" :key="product.id">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden product-card hover:shadow-lg transition-all duration-300">
+                <div class="relative">
+                    <img :src="product.image" :alt="product.name" class="w-full h-48 object-cover">
+                    <div class="absolute top-2 right-2">
+                        <span class="bg-primary-600 text-white text-xs font-semibold px-2 py-1 rounded">New</span>
+                    </div>
+                    <button class="absolute top-2 left-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100" 
+                            @click="$store.cart.add(product); $dispatch('notify', {message: 'Added to cart!', type: 'success'})">
+                        <i class="fas fa-heart text-gray-400 hover:text-red-500"></i>
                     </button>
-                    <a :href="'/products/' + product.slug"
-                       class="text-primary-600 hover:text-primary-800 text-sm font-medium flex items-center">
-                        Details <i class="fas fa-chevron-right ml-1 text-xs"></i>
-                    </a>
+                </div>
+                <div class="p-5">
+                    <!-- Name & Price Row -->
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="font-bold text-lg" x-text="product.name"></h3>
+                        <span class="text-primary-600 dark:text-primary-400 font-semibold"
+                            x-text="'₦' + Number(product.price).toLocaleString()"></span>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4"
+                       x-text="product.description.substring(0, 60) + (product.description.length > 60 ? '...' : '')"></p>
+
+                   
+
+                    <!-- Actions -->
+                    <div class="flex justify-between items-center">
+                        <button @click="$store.cart.add(product); $dispatch('notify', {message: 'Added to cart!', type: 'success'})" 
+                                class="bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg text-sm flex items-center transition-colors">
+                                <i class="fas fa-cart-plus mr-2"></i> Add to Cart
+                        </button>
+                        <a :href="'/products/' + product.slug"
+                           class="text-primary-600 hover:text-primary-800 text-sm font-medium flex items-center transition-colors">
+                            Details <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </template>
-</div>
-
+        </template>
+    </div>
 
     <!-- Loading & End States -->
     <div x-show="loading" class="text-center py-8">
-        <div class="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+        <div class="inline-flex items-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+            <span class="ml-3 text-gray-600 dark:text-gray-400">Loading more products...</span>
+        </div>
     </div>
     <div x-show="!hasMore && products.length > 0" class="text-center py-8 text-gray-500">
-        You've reached the end
+        <i class="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
+        <p>You've reached the end of our products</p>
     </div>
-    <div x-show="products.length === 0 && !loading" class="text-center py-8 text-gray-500">
-        No products found
+    <div x-show="products.length === 0 && !loading" class="text-center py-12">
+        <i class="fas fa-search text-gray-300 text-4xl mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">No products found</h3>
+        <p class="text-gray-500 dark:text-gray-400">Try adjusting your search or filter criteria</p>
+        <button @click="searchQuery = ''; selectedCategory = 'all'; sortBy = 'featured'; search();" 
+                class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+            Reset Filters
+        </button>
     </div>
 </div>
 {% endblock %}

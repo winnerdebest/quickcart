@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Payment Successful - QuickCart{% endblock %}
+{% block title %}Payment Successful - Variety by Oge{% endblock %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto text-center">
@@ -110,7 +110,7 @@ document.getElementById('downloadReceiptBtn').addEventListener('click', function
 
     const opt = {
         margin:       0.5,
-        filename:     `QuickCart_Receipt_{{ order.id }}.pdf`,
+        filename:     `Variety by Oge_Receipt_{{ order.id }}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }

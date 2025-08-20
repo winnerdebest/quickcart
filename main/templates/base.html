@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}QuickCart{% endblock %}</title>
+    <title>{% block title %}Variety by Oge{% endblock %}</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -21,16 +21,45 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: '#faf5ff',
-                            100: '#f3e8ff',
-                            200: '#e9d5ff',
-                            300: '#d8b4fe',
-                            400: '#c084fc',
-                            500: '#a855f7',
-                            600: '#9333ea',
-                            700: '#7e22ce',
-                            800: '#6b21a8',
-                            900: '#581c87',
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        secondary: {
+                            50: '#faf6ff',
+                            100: '#f2e9ff',
+                            200: '#e5d5ff',
+                            300: '#d2b3ff',
+                            400: '#b885ff',
+                            500: '#9756fd',
+                            600: '#8639f5',
+                            700: '#7428d8',
+                            800: '#6322b4',
+                            900: '#521d93',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-in': 'slideIn 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
                         }
                     }
                 }
@@ -39,92 +68,156 @@
     </script>
     <style>
         [x-cloak] { display: none !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #14b8a6 0%, #9756fd 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .smooth-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200 min-h-screen">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col">
 
     <!-- WhatsApp Floating Button -->
     <a href="https://wa.me/1234567890"
-       class="fixed bottom-6 right-6 bg-[#25D366] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-[#128C7E] transition-colors z-50">
+       class="fixed bottom-6 right-6 bg-[#25D366] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-[#128C7E] transition-all transform hover:scale-110 z-50 group">
         <i class="fab fa-whatsapp text-2xl"></i>
+        <span class="absolute -top-8 bg-gray-800 text-white text-xs py-1 px-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+            Chat with us
+        </span>
     </a>
 
     <!-- Navigation -->
-    <nav class="bg-primary-600 text-white shadow-md sticky top-0 z-40">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="/" class="text-xl font-bold flex items-center">
-                <i class="fas fa-bolt mr-2"></i>
-                QuickCart
-            </a>
+    <nav class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40 border-b border-gray-100 dark:border-gray-700">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <a href="/" class="text-xl font-bold flex items-center gradient-text">
+                    <div class="gradient-bg p-2 rounded-lg mr-2">
+                        <i class="fas fa-bolt text-white"></i>
+                    </div>
+                    <span class="bg-clip-text text-transparent gradient-bg">Variety by Oge</span>
+                </a>
 
-            <div class="flex items-center space-x-4">
-                <!-- Dark Mode Toggle -->
-                <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode); $dispatch('dark-mode-changed', { darkMode })" 
-                        class="p-2 rounded-full hover:bg-primary-700 transition-colors">
-                    <i x-show="!darkMode" class="fas fa-moon"></i>
-                    <i x-show="darkMode" class="fas fa-sun"></i>
-                </button>
+                <!--<div class="hidden md:flex space-x-8">
+                    <a href="/" class="font-medium hover:text-primary-600 dark:hover:text-primary-400 smooth-transition">Home</a>
+                    <a href="/products/" class="font-medium hover:text-primary-600 dark:hover:text-primary-400 smooth-transition">Products</a>
+                    <a href="/categories/" class="font-medium hover:text-primary-600 dark:hover:text-primary-400 smooth-transition">Categories</a>
+                    <a href="/about/" class="font-medium hover:text-primary-600 dark:hover:text-primary-400 smooth-transition">About</a>
+                    <a href="/contact/" class="font-medium hover:text-primary-600 dark:hover:text-primary-400 smooth-transition">Contact</a>
+                </div>-->
 
-                <!-- Cart Button -->
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" class="p-2 rounded-full hover:bg-primary-700 transition-colors relative">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span x-show="$store.cart.items.length > 0"
-                              class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                              x-text="$store.cart.items.length"></span>
+                <div class="flex items-center space-x-4">
+                    <!-- Search Button -->
+                    <!-- <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 smooth-transition">
+                        <i class="fas fa-search"></i>
+                    </button>-->
+
+                    <!-- User Account -->
+                    <!-- <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 smooth-transition">
+                        <i class="fas fa-user"></i>
+                    </button>-->
+
+                    <!-- Dark Mode Toggle -->
+                    <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode); $dispatch('dark-mode-changed', { darkMode })" 
+                            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 smooth-transition">
+                        <i x-show="!darkMode" class="fas fa-moon"></i>
+                        <i x-show="darkMode" class="fas fa-sun"></i>
                     </button>
 
-                    <!-- Cart Dropdown -->
-                    <div x-show="open" @click.outside="open = false" x-cloak
-                         class="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50 border border-gray-200 dark:border-gray-700">
-                        <div class="p-4">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="font-bold text-lg">Your Cart</h3>
-                                <button @click="open = false" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <template x-if="$store.cart.items.length === 0">
-                                <div class="py-6 text-center">
-                                    <i class="fas fa-shopping-cart text-3xl text-gray-400 mb-2"></i>
-                                    <p class="text-gray-500 dark:text-gray-400">Your cart is empty</p>
+                    <!-- Cart Button -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 smooth-transition relative">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span x-show="$store.cart.items.length > 0"
+                                  class="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse"
+                                  x-text="$store.cart.items.length"></span>
+                        </button>
+
+                        <!-- Cart Dropdown -->
+                        <div x-show="open" @click.outside="open = false" x-cloak
+                             class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50 border border-gray-200 dark:border-gray-700 animate-slide-in">
+                            <div class="p-4">
+                                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 dark:border-gray-700">
+                                    <h3 class="font-bold text-lg">Your Cart</h3>
+                                    <button @click="open = false" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 smooth-transition">
+                                        <i class="fas fa-times"></i>
+                                    </button>
                                 </div>
-                            </template>
-                            <template x-if="$store.cart.items.length > 0">
-                                <div>
-                                    <div class="max-h-60 overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700">
-                                        <template x-for="item in $store.cart.items" :key="item.id">
-                                            <div class="flex items-center py-3">
-                                                <img :src="item.image" class="w-12 h-12 object-cover rounded">
-                                                <div class="ml-3 flex-1">
-                                                    <h4 class="text-sm font-medium" x-text="item.name"></h4>
-                                                    <p class="text-primary-600 dark:text-primary-400 font-bold">
-                                                        ₦<span x-text="Number(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 })"></span>
-                                                    </p>
+                                <template x-if="$store.cart.items.length === 0">
+                                    <div class="py-8 text-center">
+                                        <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-3"></i>
+                                        <p class="text-gray-500 dark:text-gray-400">Your cart is empty</p>
+                                        <a href="/products/" class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:underline">Start shopping</a>
+                                    </div>
+                                </template>
+                                <template x-if="$store.cart.items.length > 0">
+                                    <div>
+                                        <div class="max-h-72 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
+                                            <template x-for="item in $store.cart.items" :key="item.id">
+                                                <div class="flex items-center py-3 smooth-transition hover:bg-gray-50 dark:hover:bg-gray-750 px-2 rounded">
+                                                    <img :src="item.image" class="w-12 h-12 object-cover rounded-lg shadow-sm">
+                                                    <div class="ml-3 flex-1">
+                                                        <h4 class="text-sm font-medium" x-text="item.name"></h4>
+                                                        <div class="flex justify-between items-center mt-1">
+                                                            <p class="text-primary-600 dark:text-primary-400 font-bold">
+                                                                ₦<span x-text="Number(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 })"></span>
+                                                            </p>
+                                                            <div class="flex items-center space-x-2">
+                                                                <span class="text-xs text-gray-500 dark:text-gray-400">Qty: <span x-text="item.quantity || 1"></span></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button @click="$store.cart.remove(item.id)" class="text-gray-400 hover:text-red-500 smooth-transition ml-2">
+                                                        <i class="fas fa-trash-alt text-sm"></i>
+                                                    </button>
                                                 </div>
-                                                <button @click="$store.cart.remove(item.id)" class="text-red-500 hover:text-red-700">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                        <div class="flex justify-between mb-4">
-                                            <span>Total:</span>
-                                            <span class="font-bold">₦<span x-text="$store.cart.total.toFixed(2)"></span></span>
+                                            </template>
                                         </div>
-                                        <button @click="open = false; window.location.href='/checkout/'" 
-                                                class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-md transition-colors">
-                                            <i class="fas fa-credit-card mr-2"></i>
-                                            Checkout
-                                        </button>
+                                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                            <div class="flex justify-between mb-4 text-lg">
+                                                <span class="font-semibold">Total:</span>
+                                                <span class="font-bold text-primary-600 dark:text-primary-400">₦<span x-text="$store.cart.total.toFixed(2)"></span></span>
+                                            </div>
+                                            <button @click="open = false; window.location.href='/checkout/'" 
+                                                    class="w-full gradient-bg hover:opacity-90 text-white py-3 rounded-lg transition-all transform hover:-translate-y-0.5 shadow-md font-medium">
+                                                <i class="fas fa-credit-card mr-2"></i>
+                                                Checkout Now
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            </template>
+                                </template>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Mobile menu button -->
+            <!--<div class="md:hidden flex justify-center mt-4">
+                <div class="flex space-x-6 overflow-x-auto pb-2">
+                    <a href="/" class="text-sm font-medium whitespace-nowrap hover:text-primary-600 dark:hover:text-primary-400 smooth-transition">Home</a>
+                    <a href="/products/" class="text-sm font-medium whitespace-nowrap hover:text-primary-600 dark:hover:text-primary-400 smooth-transition">Products</a>
+                    <a href="/categories/" class="text-sm font-medium whitespace-nowrap hover:text-primary-600 dark:hover:text-primary-400 smooth-transition">Categories</a>
+                    <a href="/about/" class="text-sm font-medium whitespace-nowrap hover:text-primary-600 dark:hover:text-primary-400 smooth-transition">About</a>
+                    <a href="/contact/" class="text-sm font-medium whitespace-nowrap hover:text-primary-600 dark:hover:text-primary-400 smooth-transition">Contact</a>
+                </div>
+            </div>-->
         </div>
     </nav>
 
@@ -136,24 +229,87 @@
          x-transition:leave="transition ease-in duration-300"
          x-transition:leave-start="opacity-100 transform translate-y-0"
          x-transition:leave-end="opacity-0 transform translate-y-2"
-         class="fixed top-20 right-4 left-4 md:left-auto md:right-4 z-50 max-w-sm w-full md:w-[20rem] px-2 md:px-0">
+         class="fixed top-20 right-4 left-4 md:left-auto md:right-4 z-50 max-w-sm w-full md:w-96 px-2 md:px-0">
         <div :class="{
             'bg-green-500': $store.notify.type === 'success',
             'bg-red-500': $store.notify.type === 'error',
             'bg-blue-500': $store.notify.type === 'info'
-        }" class="text-white px-4 py-3 rounded-lg shadow-lg">
-            <div class="flex justify-between items-center">
-                <span x-text="$store.notify.message" class="text-sm md:text-base"></span>
-                <button @click="$store.notify.show = false" class="ml-4 text-white hover:text-gray-200">
-                    <i class="fas fa-times"></i>
-                </button>
+        }" class="text-white px-4 py-3 rounded-lg shadow-lg flex items-start">
+            <div class="flex-shrink-0 mr-3 mt-0.5">
+                <template x-if="$store.notify.type === 'success'">
+                    <i class="fas fa-check-circle"></i>
+                </template>
+                <template x-if="$store.notify.type === 'error'">
+                    <i class="fas fa-exclamation-circle"></i>
+                </template>
+                <template x-if="$store.notify.type === 'info'">
+                    <i class="fas fa-info-circle"></i>
+                </template>
             </div>
+            <div class="flex-1">
+                <p x-text="$store.notify.message" class="text-sm"></p>
+            </div>
+            <button @click="$store.notify.hide()" class="ml-4 text-white hover:text-gray-200 smooth-transition">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
     </div>
 
-    <main class="container mx-auto px-4 py-6">
+    <main class="flex-1 container mx-auto px-4 py-8">
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="gradient-bg p-2 rounded-lg mr-2">
+                            <i class="fas fa-bolt text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">Variety by Oge</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">
+                        Your one-stop shop for all your needs. Fast delivery, quality products, and excellent service.
+                    </p>
+                    <div class="flex space-x-4">
+                       
+                        
+                        <a href="#" class="text-gray-500 hover:text-primary-600 smooth-transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                       
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/about/" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 smooth-transition">About Us</a></li>
+                        <li><a href="/contact/" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 smooth-transition">Contact Us</a></li>
+                        
+                    </ul>
+                </div>
+                
+                
+                
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Newsletter</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">Subscribe to our newsletter for updates on new products and special offers.</p>
+                    <form class="flex flex-col space-y-2">
+                        <input type="email" placeholder="Your email address" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700">
+                        <button type="submit" class="gradient-bg text-white py-2 rounded-lg hover:opacity-90 smooth-transition">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-200 dark:border-gray-700 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 dark:text-gray-400 text-sm">© 2025 Variety by Oge. All rights reserved.</p>
+                
+            </div>
+        </div>
+    </footer>
 
     <!-- Alpine.js Stores -->
     <script>
