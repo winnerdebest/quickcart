@@ -6,6 +6,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
     <title>{% block title %}Variety by Oge{% endblock %}</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -95,7 +99,7 @@
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col">
 
     <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/1234567890"
+    <a href="https://wa.me/+2349014612448" target="_blank" rel="noopener noreferrer"
        class="fixed bottom-6 right-6 bg-[#25D366] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-[#128C7E] transition-all transform hover:scale-110 z-50 group">
         <i class="fab fa-whatsapp text-2xl"></i>
         <span class="absolute -top-8 bg-gray-800 text-white text-xs py-1 px-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
@@ -108,9 +112,9 @@
         <div class="container mx-auto px-4 py-3">
             <div class="flex justify-between items-center">
                 <a href="/" class="text-xl font-bold flex items-center gradient-text">
-                    <div class="gradient-bg p-2 rounded-lg mr-2">
+                    <!--<div class="gradient-bg p-2 rounded-lg mr-2">
                         <i class="fas fa-bolt text-white"></i>
-                    </div>
+                    </div>-->
                     <span class="bg-clip-text text-transparent gradient-bg">Variety by Oge</span>
                 </a>
 
@@ -265,9 +269,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     <div class="flex items-center mb-4">
-                        <div class="gradient-bg p-2 rounded-lg mr-2">
-                            <i class="fas fa-bolt text-white"></i>
-                        </div>
+                        
                         <span class="text-xl font-bold">Variety by Oge</span>
                     </div>
                     <p class="text-gray-600 dark:text-gray-400 mb-4">

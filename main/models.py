@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils.text import slugify
 
+from django.conf import settings
+from cloudinary.models import CloudinaryField
+
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
@@ -8,6 +11,12 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to="products/", blank=True, null=True)
+    if settings.USE_CLOUDINARY:
+        image = CloudinaryField('products/', transformation=[
+                {'width': 800, 'height': 800, 'crop': 'limit', 'quality': 'auto', 'fetch_format': 'webp'}
+            ], default='static/example3.jpg')
+    else:
+        image = models.ImageField(upload_to='products/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
